@@ -6,23 +6,28 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from pathlib import Path
 
-st.set_page_config(page_title='ATS Checker', layout='centered')
+st.set_page_config(page_title='ATS Checker', layout='wide')
 
-# Style and background
-page_bg_img = '''
+# Absolute background overlay
+st.markdown("""
 <style>
-body {
-background-image: url('https://images.unsplash.com/photo-1605902711622-cfb43c4437d5?fit=crop&w=1500&q=80');
-background-size: cover;
+[data-testid="stAppViewContainer"] {
+    background-image: url('https://images.unsplash.com/photo-1605902711622-cfb43c4437d5?fit=crop&w=1500&q=80');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
+[data-testid="stHeader"] { background: rgba(0,0,0,0); }
+[data-testid="stSidebar"] { background: rgba(255,255,255,0.8); }
 .block-container {
-background-color: rgba(255, 255, 255, 0.9);
-padding: 2rem;
-border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.90);
+    padding: 2rem;
+    border-radius: 10px;
+    margin-top: 2rem;
 }
 </style>
-'''
-st.markdown(page_bg_img, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
+
 st.markdown("<h1 style='color:#2c3e50;'>📄 ATS Resume Checker</h1>", unsafe_allow_html=True)
 
 resume_file = st.file_uploader("Upload Resume (PDF)", type=["pdf"])
@@ -43,11 +48,10 @@ def compute_score(resume_text, jd_text):
     vect = CountVectorizer().fit_transform(documents)
     return round(cosine_similarity(vect)[0][1] * 100, 2)
 
-# File to track used emails
+# Email restriction logic
 email_file = Path("used_emails.json")
 if not email_file.exists():
     email_file.write_text(json.dumps([]))
-
 used_emails = json.loads(email_file.read_text())
 
 if match_clicked:
